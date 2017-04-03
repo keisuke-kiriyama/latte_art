@@ -148,6 +148,7 @@ def camera_img_processing(back_img_path):
         size = 1
         color = (255, 255, 255)
         start_time = time.time()
+        face_detection(img)
         cv2.putText(img, str(fps) + '[fps]', fps_position, font, size, color)
         cv2.imshow('original', img)
         key = cv2.waitKey(1)
@@ -156,6 +157,14 @@ def camera_img_processing(back_img_path):
     cap.release()
     cv2.destroyAllWindows()
 
+
+def face_detection(img):
+    color = (255, 255, 255)
+    cascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
+    facerect = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
+    if len(facerect) > 0:
+        for rect in facerect:
+            cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), color, thickness=2)
 
 if __name__ == '__main__':
     back_img_path = '../image/back_coffee1.jpg'
