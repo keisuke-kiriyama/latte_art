@@ -84,7 +84,7 @@ def get_latte_img_from_path(img_path, back_img_path):
     cv2.waitKey()
 
 
-def get_latte_img_from_cam(img, back_img, width, height, brown_img, white_img, circle_img):
+def get_latte_img_from_cam(img, back_img, brown_img, white_img, circle_img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img_mean_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 3, 2)
     img_gaussian_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 3, 2)
@@ -126,20 +126,22 @@ def camera_img_processing(back_img_path):
     white_img = create_monochromatic(245, 245, 255, camera_width, camera_height)
     circle_img = create_circle_img(camera_width, camera_height)
     start_time = time.time()
-    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('movie.mp4')
     if cap.isOpened() is False:
         print("error to connect camera")
         sys.exit()
-    cap.set(3, camera_width)
-    cap.set(4, camera_height)
+    # cap.set(3, camera_width)
+    # cap.set(4, camera_height)
     while True:
         ret, img = cap.read()
+        img = cv2.resize(img, (camera_width, camera_height))
         if ret == False:
             continue
         cv2.imshow('original', img)
         counter += 1
         counter %= 60
-        get_latte_img_from_cam(img, back_img_processed, camera_width, camera_height, brown_img, white_img, circle_img)
+        get_latte_img_from_cam(img, back_img_processed, brown_img, white_img, circle_img)
         # get_latte_img_from_cam_thresh(img, back_img, camera_width, camera_height)
         now_time = time.time()
         fps = round(1 / (now_time - start_time), 1)
@@ -148,7 +150,7 @@ def camera_img_processing(back_img_path):
         size = 1
         color = (255, 255, 255)
         start_time = time.time()
-        face_detection(img)
+        #face_detection(img)
         cv2.putText(img, str(fps) + '[fps]', fps_position, font, size, color)
         cv2.imshow('original', img)
         key = cv2.waitKey(1)

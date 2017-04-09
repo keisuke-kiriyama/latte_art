@@ -7,6 +7,7 @@ image/
 *.so
 .idea/
 .DS_Store
+movie.mp4
 
 # Distribution / packaging
 .Python
