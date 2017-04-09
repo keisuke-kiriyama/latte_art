@@ -126,13 +126,8 @@ def camera_img_processing(back_img_path):
     white_img = create_monochromatic(245, 245, 255, camera_width, camera_height)
     circle_img = create_circle_img(camera_width, camera_height)
     start_time = time.time()
-<<<<<<< HEAD
-    cap = cv2.VideoCapture(0)
-    #cap = cv2.VideoCapture('videoname')
-=======
     #cap = cv2.VideoCapture(0)
     cap = cv2.VideoCapture('movie.mp4')
->>>>>>> 57820051ba6638dd616acf9aca6500fca22da70a
     if cap.isOpened() is False:
         print("error to connect camera")
         sys.exit()
