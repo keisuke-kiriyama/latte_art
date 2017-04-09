@@ -127,6 +127,7 @@ def camera_img_processing(back_img_path):
     circle_img = create_circle_img(camera_width, camera_height)
     start_time = time.time()
     cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture('videoname')
     if cap.isOpened() is False:
         print("error to connect camera")
         sys.exit()
