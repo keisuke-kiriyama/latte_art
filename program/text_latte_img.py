@@ -35,7 +35,13 @@ def conver_latte(img, back_img):
     return img_blend
 
 
-def create_text_latte_img(back_img_path, str):
+def set_text_position_center(img_width, img_height, text, fontFace, fontScale, thickness):
+    text_size, baseline = cv2.getTextSize(text, fontFace, fontScale, thickness)
+    center_point = (int((img_width - text_size[0]) / 2), int((img_height + text_size[1]) / 2))
+    return center_point
+
+
+def create_text_latte_img(back_img_path, text):
     img_width = 380
     img_height = 375
     back_img = cv2.imread(back_img_path)
@@ -43,11 +49,12 @@ def create_text_latte_img(back_img_path, str):
     circle_img = create_circle_img(img_width, img_height)
     circle_img_thre = cv2.cvtColor(circle_img, cv2.COLOR_BGR2GRAY)
     back_img_resized = cv2.bitwise_and(back_img_resized, back_img_resized, mask = circle_img_thre)
-    text_position = (int(img_width / 2), int(img_height / 2))
     font = fonts[8]
-    size = 1
+    scale = 1
+    thickness = 3
+    text_position = set_text_position_center(img_width, img_height, text, font, scale, thickness)
     color = (58, 65, 150)
-    cv2.putText(circle_img, str, text_position, font, size, color)
+    cv2.putText(circle_img, text, text_position, font, scale, color, thickness, lineType=8, bottomLeftOrigin=False)
     latte_img = conver_latte(circle_img, back_img_resized)
     latte_img = cv2.GaussianBlur(latte_img, (5, 5), 0)
     test(latte_img)
