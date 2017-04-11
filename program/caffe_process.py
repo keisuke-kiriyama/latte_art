@@ -126,16 +126,16 @@ def camera_img_processing(back_img_path):
     white_img = create_monochromatic(245, 245, 255, camera_width, camera_height)
     circle_img = create_circle_img(camera_width, camera_height)
     start_time = time.time()
-    #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture('movie.mp4')
+    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture('movie.mp4')
     if cap.isOpened() is False:
         print("error to connect camera")
         sys.exit()
-    # cap.set(3, camera_width)
-    # cap.set(4, camera_height)
+    cap.set(3, camera_width)
+    cap.set(4, camera_height)
     while True:
         ret, img = cap.read()
-        img = cv2.resize(img, (camera_width, camera_height))
+        #img = cv2.resize(img, (camera_width, camera_height))
         if ret == False:
             continue
         cv2.imshow('original', img)
