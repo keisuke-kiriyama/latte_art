@@ -57,10 +57,10 @@ def create_text_latte_img(back_img_path, text):
     cv2.putText(circle_img, text, text_position, font, scale, color, thickness, lineType=8, bottomLeftOrigin=False)
     latte_img = conver_latte(circle_img, back_img_resized)
     latte_img = cv2.GaussianBlur(latte_img, (5, 5), 0)
-    test(latte_img)
+    test(circle_img)
 
 
 if __name__ == '__main__':
     back_img_path = '../image/back_coffee1.jpg'
-    create_text_latte_img(back_img_path, 'Kesuke')
+    create_text_latte_img(back_img_path, 'Hello world')
 
