@@ -20,7 +20,7 @@ def create_circle_img(width, height):
     else:
         radius = int(height / 2)
     img_circle = np.zeros(size, dtype=np.uint8)
-    cv2.circle(img_circle, (int(width/2), int(height/2)), radius, (255, 255, 255), -1)
+    cv2.circle(img_circle, (int(width/2), int(height/2)), radius, (128, 165, 220), -1)
     return img_circle
 
 
@@ -50,10 +50,10 @@ def create_text_latte_img(back_img_path, text):
     circle_img_thre = cv2.cvtColor(circle_img, cv2.COLOR_BGR2GRAY)
     back_img_resized = cv2.bitwise_and(back_img_resized, back_img_resized, mask = circle_img_thre)
     font = fonts[8]
-    scale = 1
+    scale = 2
     thickness = 3
     text_position = set_text_position_center(img_width, img_height, text, font, scale, thickness)
-    color = (58, 65, 150)
+    color = (200, 210, 240)
     cv2.putText(circle_img, text, text_position, font, scale, color, thickness, lineType=8, bottomLeftOrigin=False)
     latte_img = conver_latte(circle_img, back_img_resized)
     latte_img = cv2.GaussianBlur(latte_img, (5, 5), 0)
@@ -62,5 +62,5 @@ def create_text_latte_img(back_img_path, text):
 
 if __name__ == '__main__':
     back_img_path = '../image/back_coffee1.jpg'
-    create_text_latte_img(back_img_path, 'hello world')
+    create_text_latte_img(back_img_path, 'Kesuke')
 

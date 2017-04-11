@@ -53,7 +53,7 @@ def convert_latte(img_thresh, back_img, brown_img, white_img, circle_img):
     img_white_masked = cv2.bitwise_and(white_img, white_img, mask=img_thresh_inv)
     img_color = cv2.bitwise_or(img_brown_masked, img_white_masked)
     img_color_gauss = cv2.GaussianBlur(img_color,(5,5),0)
-    img_blend = cv2.addWeighted(img_color_gauss, 0.5, back_img, 0.5, 0.0)
+    img_blend = cv2.addWeighted(img_color_gauss, 0.3, back_img, 0.7, 0.0)
     img_latte = cv2.bitwise_and(img_blend, img_blend, mask=circle_img)
     return img_latte
 
@@ -86,19 +86,19 @@ def get_latte_img_from_path(img_path, back_img_path):
 
 def get_latte_img_from_cam(img, back_img, brown_img, white_img, circle_img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    img_mean_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 3, 2)
-    img_gaussian_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 3, 2)
+    # img_mean_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 3, 2)
+    # img_gaussian_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 3, 2)
     img_mean_rough_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 2)
-    img_gaussian_rough_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,
-                                                    21, 2)
-    img_mean_latte = convert_latte(img_mean_thre, back_img, brown_img, white_img, circle_img)
-    img_gaussian_latte = convert_latte(img_gaussian_thre, back_img, brown_img, white_img, circle_img)
+    # img_gaussian_rough_thre = cv2.adaptiveThreshold(img_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,
+    #                                                 21, 2)
+    # img_mean_latte = convert_latte(img_mean_thre, back_img, brown_img, white_img, circle_img)
+    # img_gaussian_latte = convert_latte(img_gaussian_thre, back_img, brown_img, white_img, circle_img)
     img_mean_rough_latte = convert_latte(img_mean_rough_thre, back_img, brown_img, white_img, circle_img)
-    img_gaussian_rough_latte = convert_latte(img_gaussian_rough_thre, back_img, brown_img, white_img, circle_img)
-    cv2.imshow('adapt_mean_window', img_mean_latte)
-    cv2.imshow('adapt_gaussian_window', img_gaussian_latte)
+    # img_gaussian_rough_latte = convert_latte(img_gaussian_rough_thre, back_img, brown_img, white_img, circle_img)
+    # cv2.imshow('adapt_mean_window', img_mean_latte)
+    # cv2.imshow('adapt_gaussian_window', img_gaussian_latte)
     cv2.imshow('adapt_mean_rough_window', img_mean_rough_latte)
-    cv2.imshow('adapt_gaussian_rough_window', img_gaussian_rough_latte)
+    # cv2.imshow('adapt_gaussian_rough_window', img_gaussian_rough_latte)
 
 
 def get_latte_img_from_cam_thresh(img, back_img, width, height):
@@ -113,10 +113,10 @@ def get_latte_img_from_cam_thresh(img, back_img, width, height):
 
 def camera_img_processing(back_img_path):
     cv2.namedWindow('original', cv2.WINDOW_AUTOSIZE)
-    cv2.namedWindow('adapt_mean_window', cv2.WINDOW_AUTOSIZE)
-    cv2.namedWindow('adapt_gaussian_window', cv2.WINDOW_AUTOSIZE)
+    # cv2.namedWindow('adapt_mean_window', cv2.WINDOW_AUTOSIZE)
+    # cv2.namedWindow('adapt_gaussian_window', cv2.WINDOW_AUTOSIZE)
     cv2.namedWindow('adapt_mean_rough_window', cv2.WINDOW_AUTOSIZE)
-    cv2.namedWindow('adapt_gaussian_rough_window', cv2.WINDOW_AUTOSIZE)
+    #cv2.namedWindow('adapt_gaussian_rough_window', cv2.WINDOW_AUTOSIZE)
     counter = 0
     camera_width = 380
     camera_height = 375
@@ -139,6 +139,10 @@ def camera_img_processing(back_img_path):
         if ret == False:
             continue
         cv2.imshow('original', img)
+        rect = face_detection(img)
+        if len(rect) > 0:
+            img = img[rect[1]:rect[1]+rect[3], rect[0]:rect[0]+rect[2]]
+            img = cv2.resize(img, (camera_width, camera_height))
         counter += 1
         counter %= 60
         get_latte_img_from_cam(img, back_img_processed, brown_img, white_img, circle_img)
@@ -150,9 +154,8 @@ def camera_img_processing(back_img_path):
         size = 1
         color = (255, 255, 255)
         start_time = time.time()
-        #face_detection(img)
         cv2.putText(img, str(fps) + '[fps]', fps_position, font, size, color)
-        cv2.imshow('original', img)
+        cv2.imshow('original_face', img)
         key = cv2.waitKey(1)
         if key == 0x1b:
             break
@@ -161,12 +164,20 @@ def camera_img_processing(back_img_path):
 
 
 def face_detection(img):
-    color = (255, 255, 255)
+    #color = (255, 255, 255)
     cascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
     facerect = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
     if len(facerect) > 0:
-        for rect in facerect:
-            cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), color, thickness=2)
+        rect = facerect[0]
+        #cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2] + rect[2:4]), color, thickness=2)
+        return rect
+    else:
+        return []
+
+
+    # if len(facerect) > 0:
+    #     for rect in facerect:
+    #         cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), color, thickness=2)
 
 if __name__ == '__main__':
     back_img_path = '../image/back_coffee1.jpg'
